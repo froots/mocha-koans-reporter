@@ -2,6 +2,7 @@
   "name": "mocha-koans",
   "version": "0.0.0",
   "description": "A Mocha reporter to allow creation of JavaScript koans for learning enlightenment",
+  "main": "index.js",
   "scripts": {
     "test": "mocha"
   },
@@ -11,6 +12,6 @@
     "reporter",
     "koans"
   ],
-  "author": "Jim Newbery <james@tinnedfruit.com>",
+  "author": "Jim Newbery <james@tinnedfruit.com> (http://tinnedfruit.com)",
   "license": "WTFPL"
 }
