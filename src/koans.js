@@ -3,28 +3,93 @@ exports = module.exports = Koans;
 var color = require('mocha').reporters.Base.color,
     util = require('util');
 
+/**
+ *   - `start`  execution started
+ *   - `end`  execution complete
+ *   - `suite`  (suite) test suite execution started
+ *   - `suite end`  (suite) all tests (and sub-suites) have finished
+ *   - `test`  (test) test execution started
+ *   - `test end`  (test) test completed
+ *   - `hook`  (hook) hook execution started
+ *   - `hook end`  (hook) hook complete
+ *   - `pass`  (test) test passed
+ *   - `fail`  (test, err) test failed
+ */
+
+ /* 
+  colours
+  'pass': 90
+  , 'fail': 31
+  , 'bright pass': 92
+  , 'bright fail': 91
+  , 'bright yellow': 93
+  , 'pending': 36
+  , 'suite': 0
+  , 'error title': 0
+  , 'error message': 31
+  , 'error stack': 90
+  , 'checkmark': 32
+  , 'fast': 90
+  , 'medium': 33
+  , 'slow': 31
+  , 'green': 32
+  , 'light': 90
+  , 'diff gutter': 90
+  , 'diff added': 42
+  , 'diff removed': 41
+*/
+
 function Koans(runner) {
+
+  var failedKoan, CR = '\n', INDENT = '  ';
 
   function write() {
     process.stdout.write(util.format.apply(null, arguments));
   }
 
+  function writeln() {
+    var args = Array.prototype.slice.call(arguments, 0);
+    args.push(CR);
+    write.apply(null, args);
+  }
+
   runner.on('start', function() {
-    write('I started');
+    write('Your path to enlightenment has started\n\n');
   });
 
   runner.on('pass', function(test) {
-    write('Test passed');
-    console.log(test);
+  /* "title": "iterates over an object",
+  "async": 0,
+  "sync": true,
+  "timedOut": false,
+  "pending": false,
+  "type": "test",
+  "parent": "#<Suite>",
+  "ctx": "#<Context>",
+  "duration": 0,
+  "state": "passed" */
   });
 
   runner.on('fail', function(test, err) {
-    write('Test failed');
-    console.log(test, err);
+    var out = color('bright fail', '✘ ' + test.fullTitle());
+    out += color('fail', ' has damaged your karma.\n');
+    test.err = err;
+    failedKoan = test;
+    write(out);
   });
 
   runner.on('end', function() {
-    write('\n\n');
-    write('Finished');
+    if (failedKoan) {
+      writeln();
+      writeln('The Master says:');
+      writeln(INDENT, color('medium', 'You have not yet reached enlightenment.'));
+      writeln(INDENT, color('medium', 'Do not lose hope.'));
+      writeln();
+      writeln('The answers you seek...');
+      writeln(INDENT, color('error message', failedKoan.err.message));
+      writeln();
+      writeln('Please meditate on the following code');
+      writeln(INDENT, color('error message', failedKoan.err.stack));
+    }
   });
 }
