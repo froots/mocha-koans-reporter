@@ -1,12 +1,18 @@
 {
-  "name": "mocha-koans",
-  "version": "0.0.0",
+  "name": "mocha-koans-reporter",
+  "version": "0.1.0",
   "description": "A Mocha reporter to allow creation of JavaScript koans for learning enlightenment",
   "main": "index.js",
   "scripts": {
     "test": "mocha"
   },
-  "repository": "",
+  "repository": { 
+    "type": "git",
+    "url": "http://github.com/froots/mocha-koans-reporter"
+  },
+  "bugs": {
+    "url" : "http://github.com/froots/mocha-koans-reporter/issues"
+  },
   "keywords": [
     "mocha",
     "reporter",
