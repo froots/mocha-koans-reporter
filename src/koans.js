@@ -54,9 +54,10 @@ var color = require('mocha').reporters.Base.color,
 
 function Koans(runner) {
 
-  var failedKoan, INDENT = '  ', total = 0, passed = 0;
+  var failedKoan, INDENT = '  ', passed = 0;
 
-  var zenStatements = [ 'Mountains are merely mountains.',
+  var zenStatements = [
+    'Mountains are merely mountains.',
     'Learn the rules so you know how to break them properly.',
     'Remember that silence is sometimes the best answer.',
     'Sleep is the best meditation.',
@@ -65,7 +66,6 @@ function Koans(runner) {
   ];
 
   function showSummary(failedKoan) {
-    writeln();
     writeln('The Master says:');
     writeln(INDENT, color('medium', 'You have not yet reached enlightenment.'));
     writeln(INDENT, color('medium', 'Do not lose hope.'));
@@ -76,7 +76,24 @@ function Koans(runner) {
     writeln('Please meditate on the following code');
     writeln(INDENT, color('error message', koanUtils.filterTrace(failedKoan.err.stack)));
     writeln();
-    writeln(color('medium', zenLikeStatement(total)));
+    writeln(color('medium', zenLikeStatement(passed)));
+  }
+
+  function showProgress(passed, total) {
+    if (!total) return false;
+    var width = 50,
+        passedChars = Math.floor(width * passed / total),
+        failedChars = width - passedChars;
+        message = 'your path thus far ',
+        summary = passed + '/' + total,
+        out = color('medium', message) +
+          color('medium', '[') +
+          color('bright pass', Array(passedChars + 1).join('.')) +
+          color('fail', 'X') +
+          color('medium', Array(failedChars).join('_')) +
+          color('medium', '] ') +
+          summary;
+    writeln(out);
   }
 
   function showCompletion() {
@@ -122,7 +139,6 @@ function Koans(runner) {
 
   runner.on('start', function() {
     passed = 0;
-    total = 0;
   });
 
   runner.on('pass', function(test) {
@@ -133,18 +149,14 @@ function Koans(runner) {
     var out = color('bright fail', '✘ ' + test.fullTitle());
     out += color('fail', ' has damaged your karma.\n');
     test.err = err;
-    test.index = total;
     failedKoan = test;
-    write(out);
-  });
-
-  runner.on('test end', function(test) {
-    total++;
+    writeln(out);
   });
 
   runner.on('end', function() {
     if (failedKoan) {
       showSummary(failedKoan);
+      showProgress(passed, this.total);
     } else {
       showCompletion();
     }
