@@ -1,7 +1,8 @@
 exports = module.exports = Koans;
 
 var color = require('mocha').reporters.Base.color,
-    util = require('util');
+    util = require('util'),
+    koanUtils = require('./koan-utils');
 
 /**
  *   - `start`  execution started
@@ -74,7 +75,7 @@ function Koans(runner) {
     writeln(INDENT, color('error message', failedKoan.err.message));
     writeln();
     writeln('Please meditate on the following code');
-    writeln(INDENT, color('error message', failedKoan.err.stack));
+    writeln(INDENT, color('error message', koanUtils.filterTrace(failedKoan.err.stack)));
   }
 
   function showCompletion() {
