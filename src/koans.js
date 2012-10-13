@@ -39,6 +39,17 @@ var color = require('mocha').reporters.Base.color,
   , 'diff removed': 41
 */
 
+/* Messages:
+ if ((recents = progress.last(5)) && recents.size == 5 && recents.uniq.size == 1)
+        puts Color.cyan("  I sense frustration. Do not be afraid to ask for help.")
+      elsif progress.last(2).size == 2 && progress.last(2).uniq.size == 1
+        puts Color.cyan("  Do not lose hope.")
+      elsif progress.last.to_i > 0
+        puts Color.cyan("  You are progressing. Excellent. #{progress.last} completed.")
+      end
+*/
+
+
 function Koans(runner) {
 
   var failedKoan, CR = '\n', INDENT = '  ';
@@ -53,8 +64,58 @@ function Koans(runner) {
     write.apply(null, args);
   }
 
+  function showSummary(failedKoan) {
+    writeln();
+    writeln('The Master says:');
+    writeln(INDENT, color('medium', 'You have not yet reached enlightenment.'));
+    writeln(INDENT, color('medium', 'Do not lose hope.'));
+    writeln();
+    writeln('The answers you seek...');
+    writeln(INDENT, color('error message', failedKoan.err.message));
+    writeln();
+    writeln('Please meditate on the following code');
+    writeln(INDENT, color('error message', failedKoan.err.stack));
+  }
+
+  function showCompletion() {
+    writeln(color('bright pass', 'Mountains are merely mountains again.'));
+    writeln();
+    writeln(color('bright pass', '                                                                                '));
+    writeln(color('bright pass', '                                     ++                                         '));
+    writeln(color('bright pass', '                                   ++++++          +++                          '));
+    writeln(color('bright pass', '                       ++++++     ++++++++++      ++++++                        '));
+    writeln(color('bright pass', '                       ++++++    ++++++++++++     ++++++                        '));
+    writeln(color('bright pass', '                       ++++++   +++++++++++++++   ++++++                        '));
+    writeln(color('bright pass', '                               +++++++++++++++++          ++++++                '));
+    writeln(color('bright pass', '                              +++++++++++++++++++    ++++++++++++               '));
+    writeln(color('bright pass', '            +++++++++++++++++++++++       ++++++++++++++++++++++++              '));
+    writeln(color('bright pass', '            ++++++++++++++++++++++         +++++++++++++++++++++++              '));
+    writeln(color('bright pass', '            +++++++++++++++++++++           ++++++++++++++++++++++              '));
+    writeln(color('bright pass', '            ++++++++++++++++++++++           ++++++       ++++++++              '));
+    writeln(color('bright pass', '            +++++++++    +++++++++++         ++++++        ++++++++             '));
+    writeln(color('bright pass', '    +++++   +++++++          ++++++++        ++++++         +++++++  ++++++     '));
+    writeln(color('bright pass', '   +++++++   +++++             +++++++        +++++         +++++++  ++++++     '));
+    writeln(color('bright pass', '    +++++    +++++               ++++++       +++++         ++++++   +++++      '));
+    writeln(color('bright pass', '     +++     +++++                +++++       +++++        +++++++              '));
+    writeln(color('bright pass', '              +++++++               ++++      ++++         ++++++++++++         '));
+    writeln(color('bright pass', '          ++++++++++++++++           +++      ++++        +++++++++++++++++     '));
+    writeln(color('bright pass', '       +++++++++++++++++++++++        +++     +++        +++++++ +++++++++++++  '));
+    writeln(color('bright pass', '     +++++++++++++++++++++++++++      +++    ++++       +++++++    +++++++++++++'));
+    writeln(color('bright pass', '   +++++++++++++           +++++++     ++    +++       ++++++        ++++++++++ '));
+    writeln(color('bright pass', '  ++++++++++                    ++++    +    ++      +++++++         ++++++++++ '));
+    writeln(color('bright pass', ' ++++++++++                        ++   +   ++      ++++++           +++++++++  '));
+    writeln(color('bright pass', '+++++++++++                          +     ++     ++++++             ++++++++   '));
+    writeln(color('bright pass', '  +++++++++              ++++++++++            +++++               +++++++++    '));
+    writeln(color('bright pass', '   ++++++++        ++++++++++++++           ++                   ++++++++++     '));
+    writeln(color('bright pass', '     +++++++    +++++++++++++                                  +++++++++++      '));
+    writeln(color('bright pass', '      ++++++++++++++++++++                  ++           +++++++++++++++        '));
+    writeln(color('bright pass', '         +++++++++++++++                       +++++++++++++++++++++++          '));
+    writeln(color('bright pass', '           +++++++++                              +++++++++++++++++             '));
+    writeln(color('bright pass', '                                                                                '));
+  }
+
   runner.on('start', function() {
-    write('Your path to enlightenment has started\n\n');
+    
   });
 
   runner.on('pass', function(test) {
@@ -80,16 +141,9 @@ function Koans(runner) {
 
   runner.on('end', function() {
     if (failedKoan) {
-      writeln();
-      writeln('The Master says:');
-      writeln(INDENT, color('medium', 'You have not yet reached enlightenment.'));
-      writeln(INDENT, color('medium', 'Do not lose hope.'));
-      writeln();
-      writeln('The answers you seek...');
-      writeln(INDENT, color('error message', failedKoan.err.message));
-      writeln();
-      writeln('Please meditate on the following code');
-      writeln(INDENT, color('error message', failedKoan.err.stack));
+      showSummary(failedKoan);
+    } else {
+      showCompletion();
     }
   });
 }
