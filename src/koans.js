@@ -54,7 +54,15 @@ var color = require('mocha').reporters.Base.color,
 
 function Koans(runner) {
 
-  var failedKoan, INDENT = '  ';
+  var failedKoan, INDENT = '  ', total = 0, passed = 0;
+
+  var zenStatements = [ 'Mountains are merely mountains.',
+    'Learn the rules so you know how to break them properly.',
+    'Remember that silence is sometimes the best answer.',
+    'Sleep is the best meditation.',
+    'When you lose, don\'t lose the lesson.',
+    'Things are not what they appear to be: nor are they otherwise.'
+  ];
 
   function showSummary(failedKoan) {
     writeln();
@@ -67,6 +75,8 @@ function Koans(runner) {
     writeln();
     writeln('Please meditate on the following code');
     writeln(INDENT, color('error message', koanUtils.filterTrace(failedKoan.err.stack)));
+    writeln();
+    writeln(color('medium', zenLikeStatement(total)));
   }
 
   function showCompletion() {
@@ -106,29 +116,30 @@ function Koans(runner) {
     writeln(color('bright pass', '                                                                                '));
   }
 
+  function zenLikeStatement(i) {
+    return zenStatements[i % zenStatements.length];
+  }
+
   runner.on('start', function() {
-    
+    passed = 0;
+    total = 0;
   });
 
   runner.on('pass', function(test) {
-  /* "title": "iterates over an object",
-  "async": 0,
-  "sync": true,
-  "timedOut": false,
-  "pending": false,
-  "type": "test",
-  "parent": "#<Suite>",
-  "ctx": "#<Context>",
-  "duration": 0,
-  "state": "passed" */
+    passed++;
   });
 
   runner.on('fail', function(test, err) {
     var out = color('bright fail', '✘ ' + test.fullTitle());
     out += color('fail', ' has damaged your karma.\n');
     test.err = err;
+    test.index = total;
     failedKoan = test;
     write(out);
+  });
+
+  runner.on('test end', function(test) {
+    total++;
   });
 
   runner.on('end', function() {
