@@ -1,8 +1,9 @@
 exports = module.exports = Koans;
 
 var color = require('mocha').reporters.Base.color,
-    util = require('util'),
-    koanUtils = require('./koan-utils');
+    koanUtils = require('./koan-utils'),
+    write = koanUtils.write,
+    writeln = koanUtils.writeln;
 
 /**
  *   - `start`  execution started
@@ -53,17 +54,7 @@ var color = require('mocha').reporters.Base.color,
 
 function Koans(runner) {
 
-  var failedKoan, CR = '\n', INDENT = '  ';
-
-  function write() {
-    process.stdout.write(util.format.apply(null, arguments));
-  }
-
-  function writeln() {
-    var args = Array.prototype.slice.call(arguments, 0);
-    args.push(CR);
-    write.apply(null, args);
-  }
+  var failedKoan, INDENT = '  ';
 
   function showSummary(failedKoan) {
     writeln();
