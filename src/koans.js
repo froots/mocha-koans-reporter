@@ -8,7 +8,12 @@ exports = module.exports = Koans;
 
 function Koans(runner) {
 
-  var failedKoan, INDENT = '  ', passed = 0, recentProgress, canRecordProgress = true,
+  var failedKoan,
+      INDENT = '  ',
+      passed = 0,
+      previousPassCount = 0,
+      progress,
+      canRecordProgress = true,
       PROGRESS_FILE = '.path-progress',
       PROGRESS_DIRECTORY = './';
 
@@ -93,6 +98,11 @@ function Koans(runner) {
     return zenStatements[i % zenStatements.length];
   }
 
+  function initProgress() {
+    progress = readProgress();
+    previousPassCount = (progress.length) ? parseInt(progress[progress.length - 1], 10) : 0;
+  }
+
   function readProgress() {
     var contents;
     try {
@@ -111,8 +121,8 @@ function Koans(runner) {
   }
 
   function recordProgress(passed) {
-    recentProgress.push(passed);
-    writeProgress(recentProgress);
+    progress.push(passed);
+    writeProgress(progress);
   }
 
   runner.on('start', function() {
@@ -121,23 +131,30 @@ function Koans(runner) {
     process.stdout.write('\u001b[2J');
     // set cursor position
     process.stdout.write('\u001b[1;3H');
-    recentProgress = readProgress();
+    writeln();
+    initProgress();
   });
 
   runner.on('pass', function(test) {
-    passed++;
+    passed += 1;
+    if (passed > previousPassCount) {
+      var out = color('bright pass', '✔ ' + test.fullTitle());
+      out += color('pass', ' has expanded your awareness.');
+      writeln(out);
+    }
   });
 
   runner.on('fail', function(test, err) {
     var out = color('bright fail', '✘ ' + test.fullTitle());
-    out += color('fail', ' has damaged your karma.\n');
+    out += color('fail', ' has damaged your karma.');
+    writeln(out);
     test.err = err;
     failedKoan = test;
-    writeln(out);
   });
 
   runner.on('end', function() {
     if (failedKoan) {
+      writeln();
       recordProgress(passed);
       showSummary(failedKoan);
       showProgress(passed, this.total);
