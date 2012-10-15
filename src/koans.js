@@ -1,13 +1,16 @@
-exports = module.exports = Koans;
-
-var color = require('mocha').reporters.Base.color,
+var fs = require('fs'),
+    color = require('mocha').reporters.Base.color,
     koanUtils = require('./koan-utils'),
     write = koanUtils.write,
     writeln = koanUtils.writeln;
 
+exports = module.exports = Koans;
+
 function Koans(runner) {
 
-  var failedKoan, INDENT = '  ', passed = 0;
+  var failedKoan, INDENT = '  ', passed = 0, recentProgress, canRecordProgress = true,
+      PROGRESS_FILE = '.path-progress',
+      PROGRESS_DIRECTORY = './';
 
   var zenStatements = [
     'Mountains are merely mountains.',
@@ -90,8 +93,35 @@ function Koans(runner) {
     return zenStatements[i % zenStatements.length];
   }
 
+  function readProgress() {
+    var contents;
+    try {
+      contents = fs.readFileSync(PROGRESS_FILE);
+    } catch(e) {}
+    return (contents) ? ('' + contents).split(',') : [];
+  }
+
+  function writeProgress(progress) {
+    try {
+      fs.writeFileSync(PROGRESS_DIRECTORY + PROGRESS_FILE, progress.join(','));
+    } catch(e) {
+      // Can't keep track of progress
+      canRecordProgress = false;
+    }
+  }
+
+  function recordProgress(passed) {
+    recentProgress.push(passed);
+    writeProgress(recentProgress);
+  }
+
   runner.on('start', function() {
     passed = 0;
+    // clear screen
+    process.stdout.write('\u001b[2J');
+    // set cursor position
+    process.stdout.write('\u001b[1;3H');
+    recentProgress = readProgress();
   });
 
   runner.on('pass', function(test) {
@@ -108,6 +138,7 @@ function Koans(runner) {
 
   runner.on('end', function() {
     if (failedKoan) {
+      recordProgress(passed);
       showSummary(failedKoan);
       showProgress(passed, this.total);
     } else {
