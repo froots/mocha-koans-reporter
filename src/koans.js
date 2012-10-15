@@ -26,10 +26,26 @@ function Koans(runner) {
     'Things are not what they appear to be: nor are they otherwise.'
   ];
 
+  function encourage() {
+    var len = progress.length,
+        lastFive = progress.slice(-5).sort(),
+        lastTwo = progress.slice(-2);
+    if (len >= 5 && (lastFive[0] == lastFive[lastFive.length - 1])) {
+      return 'I sense frustration. Do not be afraid to ask for help.';
+    } else if (len >= 2 && lastTwo[0] == lastTwo[1]) {
+      return 'Do not lose hope.';
+    } else if (passed > 0) {
+      return 'You are progressing. Excellent. ' + passed + ' completed.';
+    } else {
+      return '';
+    }
+  }
+
   function showSummary(failedKoan) {
+    var encourageMessage = encourage();
     writeln('The Master says:');
     writeln(INDENT, color('medium', 'You have not yet reached enlightenment.'));
-    writeln(INDENT, color('medium', 'Do not lose hope.'));
+    if (encourageMessage) writeln(INDENT, color('medium', encourage()));
     writeln();
     writeln('The answers you seek...');
     writeln(INDENT, color('error message', failedKoan.err.message));
