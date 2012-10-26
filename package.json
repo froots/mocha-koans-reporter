@@ -1,6 +1,6 @@
 {
   "name": "mocha-koans-reporter",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A Mocha reporter to allow creation of JavaScript koans for learning enlightenment",
   "main": "index.js",
   "scripts": {
