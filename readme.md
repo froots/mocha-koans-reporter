@@ -24,6 +24,7 @@ Usage
   * [Chai](http://chaijs.com/) or another assertion library
 1. Create a `test` directory to hold your koans.
 1. Create a `test/mocha.opts` file to specify default mocha running options with the following contents
+
     ```
     --reporter mocha-koans-reporter
     --require test/common
@@ -31,13 +32,17 @@ Usage
     --recursive
     --watch
     ```
+
 1. Create a `test/common.js` file to specify global module dependencies across your koans, and set other defaults, e.g:
+
     ```javascript
     global.chai = require('chai');
     global.expect = chai.expect;
     global.__ = "FILL ME IN";
     ```
+
 1. Create 1 or more test files in your `test` directory, e.g. `test/about-truth.js`:
+
     ```javascript
     describe('truthiness', function() {
       it('is indeed true', function() {
@@ -45,9 +50,12 @@ Usage
       });
     });
     ```
+
 1. You can then run koans with `mocha`, or map `npm test` to this by adding this to your `package.json`:
+
     ```javascript
     "scripts": {
       "test": "mocha"
     }
     ```
+    
