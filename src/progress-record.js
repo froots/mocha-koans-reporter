@@ -1,5 +1,4 @@
 var fs = require('fs'),
-    _ = require('underscore'),
     PROGRESS_FILE = '.path-progress',
     PROGRESS_DIRECTORY = './';
 
@@ -59,8 +58,6 @@ ProgressRecord.prototype.encourage = function(passCount) {
 ProgressRecord.prototype.processProgress = function(contents) {
   if (!contents) return false;
   var progress = (contents + '').split(',');
-  return _.chain(progress)
-    .compact()
-    .map( function(item) { return parseInt(item, 10); } )
-    .value();
+  return progress.filter(function(item) { return !!item; })
+    .map(function(item) { return parseInt(item, 10); });
 };
