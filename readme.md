@@ -19,8 +19,27 @@ Install
 Usage
 -----
 
-Run with a suite of mocha tests:
-
-    mocha -R mocha-koans-reporter -b [test-directory]
-
-It is important to use the `-b` flag to bail on the first failure, as is the style for koans.
+1. Create a project for your koans with the following dependencies:
+  * [Mocha](http://visionmedia.github.com/mocha/)
+  * [Chai](http://chaijs.com/) or another assertion library
+1. Create a `test` directory to hold your koans.
+1. Create a `test/mocha.opts` file to specify default mocha running options with the following contents
+    --reporter mocha-koans-reporter
+    --require test/common
+    --bail
+    --recursive
+    --watch
+1. Create a `test/common.js` file to specify global module dependencies across your koans, and set other defaults, e.g:
+    global.chai = require('chai');
+    global.expect = chai.expect;
+    global.__ = "FILL ME IN";
+1. Create 1 or more test files in your `test` directory, e.g. `test/about-truth.js`:
+    describe('truthiness', function() {
+      it('is indeed true', function() {
+        expect(true).to.equal(__);
+      });
+    });
+1. You can then run koans with `mocha`, or map `npm test` to this by adding this to your `package.json`:
+    "scripts": {
+      "test": "mocha"
+    }

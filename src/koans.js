@@ -1,13 +1,15 @@
-exports = module.exports = Koans;
+var fs = require('fs'),
+    color = require('mocha').reporters.Base.color,
+    ProgressRecord = require('./progress-record');
 
-var color = require('mocha').reporters.Base.color,
-    koanUtils = require('./koan-utils'),
-    write = koanUtils.write,
-    writeln = koanUtils.writeln;
+exports = module.exports = Koans;
 
 function Koans(runner) {
 
-  var failedKoan, INDENT = '  ', passed = 0;
+  var failedKoan,
+      INDENT = '  ',
+      passed = 0,
+      progress = new ProgressRecord();
 
   var zenStatements = [
     'Mountains are merely mountains.',
@@ -19,17 +21,18 @@ function Koans(runner) {
   ];
 
   function showSummary(failedKoan) {
-    writeln('The Master says:');
-    writeln(INDENT, color('medium', 'You have not yet reached enlightenment.'));
-    writeln(INDENT, color('medium', 'Do not lose hope.'));
-    writeln();
-    writeln('The answers you seek...');
-    writeln(INDENT, color('error message', failedKoan.err.message));
-    writeln();
-    writeln('Please meditate on the following code');
-    writeln(INDENT, color('error message', koanUtils.filterTrace(failedKoan.err.stack)));
-    writeln();
-    writeln(color('medium', zenLikeStatement(passed)));
+    var encourageMessage = progress.encourage(passed);
+    console.log('The Master says:');
+    console.log(INDENT + color('medium', 'You have not yet reached enlightenment.'));
+    if (encourageMessage) console.log(INDENT + color('medium', encourageMessage));
+    console.log();
+    console.log('The answers you seek...');
+    console.log(INDENT + color('error message', failedKoan.err.message));
+    console.log();
+    console.log('Please meditate on the following code');
+    console.log(INDENT + color('error message', filterTrace(failedKoan.err.stack)));
+    console.log();
+    console.log(color('medium', zenLikeStatement(passed)));
   }
 
   function showProgress(passed, total) {
@@ -46,68 +49,88 @@ function Koans(runner) {
           color('medium', Array(failedChars).join('_')) +
           color('medium', '] ') +
           summary;
-    writeln(out);
+    console.log(out);
   }
 
   function showCompletion() {
-    writeln(color('bright pass', 'Mountains are merely mountains again.'));
-    writeln();
-    writeln(color('bright pass', '                                                                                '));
-    writeln(color('bright pass', '                                     ++                                         '));
-    writeln(color('bright pass', '                                   ++++++          +++                          '));
-    writeln(color('bright pass', '                       ++++++     ++++++++++      ++++++                        '));
-    writeln(color('bright pass', '                       ++++++    ++++++++++++     ++++++                        '));
-    writeln(color('bright pass', '                       ++++++   +++++++++++++++   ++++++                        '));
-    writeln(color('bright pass', '                               +++++++++++++++++          ++++++                '));
-    writeln(color('bright pass', '                              +++++++++++++++++++    ++++++++++++               '));
-    writeln(color('bright pass', '            +++++++++++++++++++++++       ++++++++++++++++++++++++              '));
-    writeln(color('bright pass', '            ++++++++++++++++++++++         +++++++++++++++++++++++              '));
-    writeln(color('bright pass', '            +++++++++++++++++++++           ++++++++++++++++++++++              '));
-    writeln(color('bright pass', '            ++++++++++++++++++++++           ++++++       ++++++++              '));
-    writeln(color('bright pass', '            +++++++++    +++++++++++         ++++++        ++++++++             '));
-    writeln(color('bright pass', '    +++++   +++++++          ++++++++        ++++++         +++++++  ++++++     '));
-    writeln(color('bright pass', '   +++++++   +++++             +++++++        +++++         +++++++  ++++++     '));
-    writeln(color('bright pass', '    +++++    +++++               ++++++       +++++         ++++++   +++++      '));
-    writeln(color('bright pass', '     +++     +++++                +++++       +++++        +++++++              '));
-    writeln(color('bright pass', '              +++++++               ++++      ++++         ++++++++++++         '));
-    writeln(color('bright pass', '          ++++++++++++++++           +++      ++++        +++++++++++++++++     '));
-    writeln(color('bright pass', '       +++++++++++++++++++++++        +++     +++        +++++++ +++++++++++++  '));
-    writeln(color('bright pass', '     +++++++++++++++++++++++++++      +++    ++++       +++++++    +++++++++++++'));
-    writeln(color('bright pass', '   +++++++++++++           +++++++     ++    +++       ++++++        ++++++++++ '));
-    writeln(color('bright pass', '  ++++++++++                    ++++    +    ++      +++++++         ++++++++++ '));
-    writeln(color('bright pass', ' ++++++++++                        ++   +   ++      ++++++           +++++++++  '));
-    writeln(color('bright pass', '+++++++++++                          +     ++     ++++++             ++++++++   '));
-    writeln(color('bright pass', '  +++++++++              ++++++++++            +++++               +++++++++    '));
-    writeln(color('bright pass', '   ++++++++        ++++++++++++++           ++                   ++++++++++     '));
-    writeln(color('bright pass', '     +++++++    +++++++++++++                                  +++++++++++      '));
-    writeln(color('bright pass', '      ++++++++++++++++++++                  ++           +++++++++++++++        '));
-    writeln(color('bright pass', '         +++++++++++++++                       +++++++++++++++++++++++          '));
-    writeln(color('bright pass', '           +++++++++                              +++++++++++++++++             '));
-    writeln(color('bright pass', '                                                                                '));
+    console.log(color('bright pass', 'Mountains are merely mountains again.'));
+    console.log();
+    console.log(color('bright pass', '                                                                                '));
+    console.log(color('bright pass', '                                     ++                                         '));
+    console.log(color('bright pass', '                                   ++++++          +++                          '));
+    console.log(color('bright pass', '                       ++++++     ++++++++++      ++++++                        '));
+    console.log(color('bright pass', '                       ++++++    ++++++++++++     ++++++                        '));
+    console.log(color('bright pass', '                       ++++++   +++++++++++++++   ++++++                        '));
+    console.log(color('bright pass', '                               +++++++++++++++++          ++++++                '));
+    console.log(color('bright pass', '                              +++++++++++++++++++    ++++++++++++               '));
+    console.log(color('bright pass', '            +++++++++++++++++++++++       ++++++++++++++++++++++++              '));
+    console.log(color('bright pass', '            ++++++++++++++++++++++         +++++++++++++++++++++++              '));
+    console.log(color('bright pass', '            +++++++++++++++++++++           ++++++++++++++++++++++              '));
+    console.log(color('bright pass', '            ++++++++++++++++++++++           ++++++       ++++++++              '));
+    console.log(color('bright pass', '            +++++++++    +++++++++++         ++++++        ++++++++             '));
+    console.log(color('bright pass', '    +++++   +++++++          ++++++++        ++++++         +++++++  ++++++     '));
+    console.log(color('bright pass', '   +++++++   +++++             +++++++        +++++         +++++++  ++++++     '));
+    console.log(color('bright pass', '    +++++    +++++               ++++++       +++++         ++++++   +++++      '));
+    console.log(color('bright pass', '     +++     +++++                +++++       +++++        +++++++              '));
+    console.log(color('bright pass', '              +++++++               ++++      ++++         ++++++++++++         '));
+    console.log(color('bright pass', '          ++++++++++++++++           +++      ++++        +++++++++++++++++     '));
+    console.log(color('bright pass', '       +++++++++++++++++++++++        +++     +++        +++++++ +++++++++++++  '));
+    console.log(color('bright pass', '     +++++++++++++++++++++++++++      +++    ++++       +++++++    +++++++++++++'));
+    console.log(color('bright pass', '   +++++++++++++           +++++++     ++    +++       ++++++        ++++++++++ '));
+    console.log(color('bright pass', '  ++++++++++                    ++++    +    ++      +++++++         ++++++++++ '));
+    console.log(color('bright pass', ' ++++++++++                        ++   +   ++      ++++++           +++++++++  '));
+    console.log(color('bright pass', '+++++++++++                          +     ++     ++++++             ++++++++   '));
+    console.log(color('bright pass', '  +++++++++              ++++++++++            +++++               +++++++++    '));
+    console.log(color('bright pass', '   ++++++++        ++++++++++++++           ++                   ++++++++++     '));
+    console.log(color('bright pass', '     +++++++    +++++++++++++                                  +++++++++++      '));
+    console.log(color('bright pass', '      ++++++++++++++++++++                  ++           +++++++++++++++        '));
+    console.log(color('bright pass', '         +++++++++++++++                       +++++++++++++++++++++++          '));
+    console.log(color('bright pass', '           +++++++++                              +++++++++++++++++             '));
+    console.log(color('bright pass', '                                                                                '));
   }
 
   function zenLikeStatement(i) {
     return zenStatements[i % zenStatements.length];
   }
 
+  function filterTrace(trace) {
+    var lines = trace.split('\n');
+    return lines.filter(function(line) {
+      return !line.match(/mocha/) && !line.match(/\(node\.js\:\d+\:\d+\)$/);
+    }).join('\n');
+  }
+
   runner.on('start', function() {
     passed = 0;
+    // clear screen
+    process.stdout.write('\u001b[2J');
+    // set cursor position
+    process.stdout.write('\u001b[1;3H');
+    console.log();
+    progress.init();
   });
 
   runner.on('pass', function(test) {
-    passed++;
+    passed += 1;
+    if (passed > progress.previous) {
+      var out = color('bright pass', '✔ ' + test.fullTitle());
+      out += color('pass', ' has expanded your awareness.');
+      console.log(out);
+    }
   });
 
   runner.on('fail', function(test, err) {
     var out = color('bright fail', '✘ ' + test.fullTitle());
-    out += color('fail', ' has damaged your karma.\n');
+    out += color('fail', ' has damaged your karma.');
+    console.log(out);
     test.err = err;
     failedKoan = test;
-    writeln(out);
   });
 
   runner.on('end', function() {
     if (failedKoan) {
+      console.log();
+      progress.save(passed);
       showSummary(failedKoan);
       showProgress(passed, this.total);
     } else {
