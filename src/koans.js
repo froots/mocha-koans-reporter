@@ -12,7 +12,6 @@ function Koans(runner) {
   var failedKoan,
       INDENT = '  ',
       passed = 0,
-      previousPassCount = 0,
       progress = new ProgressRecord();
 
   var zenStatements = [
@@ -109,7 +108,7 @@ function Koans(runner) {
 
   runner.on('pass', function(test) {
     passed += 1;
-    if (passed > previousPassCount) {
+    if (passed > progress.previous) {
       var out = color('bright pass', '✔ ' + test.fullTitle());
       out += color('pass', ' has expanded your awareness.');
       writeln(out);
