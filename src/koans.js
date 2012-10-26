@@ -1,6 +1,7 @@
 var fs = require('fs'),
     color = require('mocha').reporters.Base.color,
     koanUtils = require('./koan-utils'),
+    ProgressRecord = require('./progress-record'),
     write = koanUtils.write,
     writeln = koanUtils.writeln;
 
@@ -12,10 +13,7 @@ function Koans(runner) {
       INDENT = '  ',
       passed = 0,
       previousPassCount = 0,
-      progress,
-      canRecordProgress = true,
-      PROGRESS_FILE = '.path-progress',
-      PROGRESS_DIRECTORY = './';
+      progress = new ProgressRecord();
 
   var zenStatements = [
     'Mountains are merely mountains.',
@@ -26,26 +24,11 @@ function Koans(runner) {
     'Things are not what they appear to be: nor are they otherwise.'
   ];
 
-  function encourage() {
-    var len = progress.length,
-        lastFive = progress.slice(-5).sort(),
-        lastTwo = progress.slice(-2);
-    if (len >= 5 && (lastFive[0] == lastFive[lastFive.length - 1])) {
-      return 'I sense frustration. Do not be afraid to ask for help.';
-    } else if (len >= 2 && lastTwo[0] == lastTwo[1]) {
-      return 'Do not lose hope.';
-    } else if (passed > 0) {
-      return 'You are progressing. Excellent. ' + passed + ' completed.';
-    } else {
-      return '';
-    }
-  }
-
   function showSummary(failedKoan) {
-    var encourageMessage = encourage();
+    var encourageMessage = progress.encourage(passed);
     writeln('The Master says:');
     writeln(INDENT, color('medium', 'You have not yet reached enlightenment.'));
-    if (encourageMessage) writeln(INDENT, color('medium', encourage()));
+    if (encourageMessage) writeln(INDENT, color('medium', encourageMessage));
     writeln();
     writeln('The answers you seek...');
     writeln(INDENT, color('error message', failedKoan.err.message));
@@ -114,33 +97,6 @@ function Koans(runner) {
     return zenStatements[i % zenStatements.length];
   }
 
-  function initProgress() {
-    progress = readProgress();
-    previousPassCount = (progress.length) ? parseInt(progress[progress.length - 1], 10) : 0;
-  }
-
-  function readProgress() {
-    var contents;
-    try {
-      contents = fs.readFileSync(PROGRESS_FILE);
-    } catch(e) {}
-    return (contents) ? ('' + contents).split(',') : [];
-  }
-
-  function writeProgress(progress) {
-    try {
-      fs.writeFileSync(PROGRESS_DIRECTORY + PROGRESS_FILE, progress.join(','));
-    } catch(e) {
-      // Can't keep track of progress
-      canRecordProgress = false;
-    }
-  }
-
-  function recordProgress(passed) {
-    progress.push(passed);
-    writeProgress(progress);
-  }
-
   runner.on('start', function() {
     passed = 0;
     // clear screen
@@ -148,7 +104,7 @@ function Koans(runner) {
     // set cursor position
     process.stdout.write('\u001b[1;3H');
     writeln();
-    initProgress();
+    progress.init();
   });
 
   runner.on('pass', function(test) {
@@ -171,7 +127,7 @@ function Koans(runner) {
   runner.on('end', function() {
     if (failedKoan) {
       writeln();
-      recordProgress(passed);
+      progress.save(passed);
       showSummary(failedKoan);
       showProgress(passed, this.total);
     } else {
