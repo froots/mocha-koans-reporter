@@ -1,7 +1,7 @@
 mocha-koans-reporter
 ====================
 
-A reporter for [mocha](http://visionmedia.github.com/mocha/) to simplify the creation of JavaScript koans.
+A reporter for [mocha](http://mochajs.org/) to simplify the creation of JavaScript koans.
 
 Heavily inspired by and modelled on the [New Context Ruby Koans](http://rubykoans.com/).
 
@@ -20,7 +20,7 @@ Usage
 -----
 
 1. Create a project for your koans with the following dependencies:
-  * [Mocha](http://visionmedia.github.com/mocha/)
+  * [Mocha](http://mochajs.org/)
   * [Chai](http://chaijs.com/) or another assertion library
 1. Create a `test` directory to hold your koans.
 1. Create a `test/mocha.opts` file to specify default mocha running options with the following contents
